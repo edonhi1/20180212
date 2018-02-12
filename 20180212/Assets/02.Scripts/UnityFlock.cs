@@ -57,6 +57,39 @@ public class UnityFlock : MonoBehaviour {
     }
 	
 	void Update () {
-		
+        float speed = velocity.magnitude;
+        Vector3 avgVelocity = Vector3.zero;
+        Vector3 avgPosition = Vector3.zero;
+        float count = 0;
+        float f = 0f;
+        float d = 0f;
+        Vector3 myPosition = transformComponent.position;
+        Vector3 forceV;
+        Vector3 toAvg;
+        Vector3 wantedVel;
+
+        for (int i = 0; i < objects.Length; i++)
+        {
+            Transform transform = objects[i];
+            if (transform != transformComponent)
+            {
+                Vector3 otherPosition = transform.position;
+                avgPosition += otherPosition;
+                count++;
+                forceV = myPosition - otherPosition;
+                d = forceV.magnitude;
+                if (d < followRadius)
+                {
+                    f = 1f - (d / avoidanceRadius);
+                    if (d > 0)
+                    {
+                        avgVelocity += (forceV / d) * f * avoidanceForce;
+                    }
+                }
+                f = d / followRadius;
+                UnityFlock otherSeaGull = otherFlocks[i];
+                avgVelocity += otherSeaGull.normalizedVelocity * f * followVelocity;
+            }
+        }
 	}
 }
